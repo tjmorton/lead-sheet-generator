@@ -7,9 +7,8 @@
 
 # Clean test
 ```bash
-# From services/audio-decetion
--rf pretrained_models/*/
 # From monorepo root (where the docker compose lives)
+rm -rf services/audio-detection/pretrained_models/*/
 docker compose build
 docker compose run --rm audio-detection   # first run: populates volumes, downloads demucs
 docker compose run --rm audio-detection   # second run: should be instant (no "populating" messages)
