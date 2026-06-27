@@ -52,7 +52,16 @@ with patch("demucs.pretrained.get_model") as mock_get_model:
 
 When a function does a runtime import inside its body (e.g. `import madmom.models`), the patch target is the imported module, not the module under test.
 
-Use `patch.object` sparingly — prefer `@patch` / `with patch(...)` for clarity.
+Use `patch.object` sparingly — prefer `@patch` / `with patch(...)` for clarity. Combine multiple context managers into a single parenthesised `with` block (SIM117 / Python 3.10+):
+
+```python
+with (
+    patch("demucs.pretrained.get_model") as mock_get_model,
+    patch.object(os, "listdir", return_value=["a.th"]),
+    patch.object(os.path, "isdir", return_value=True),
+):
+    module_under_test._check_demucs()
+```
 
 ## Assertions
 
