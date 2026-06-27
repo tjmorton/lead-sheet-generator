@@ -1,0 +1,1 @@
+- Move the logging setup in audio-detection __main.py__ to it's own utility function

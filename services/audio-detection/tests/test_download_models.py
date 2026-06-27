@@ -48,8 +48,12 @@ class TestCheckDemucs:
 
 class TestCheckBasicPitch:
     def test_model_path_is_resolved(self, capsys):
-        with patch("basic_pitch.__file__", "/fake/site-packages/basic_pitch/__init__.py"):
-            with patch.object(os, "walk", return_value=[("/fake/path", [], ["a.onnx", "b.tflite"])]):
+        with patch(
+            "basic_pitch.__file__", "/fake/site-packages/basic_pitch/__init__.py"
+        ):
+            with patch.object(
+                os, "walk", return_value=[("/fake/path", [], ["a.onnx", "b.tflite"])]
+            ):
                 with patch.object(os.path, "exists", return_value=True):
                     download_models._check_basic_pitch()
 
@@ -58,7 +62,9 @@ class TestCheckBasicPitch:
         assert "2 files" in captured
 
     def test_zero_files_when_path_missing(self, capsys):
-        with patch("basic_pitch.__file__", "/fake/site-packages/basic_pitch/__init__.py"):
+        with patch(
+            "basic_pitch.__file__", "/fake/site-packages/basic_pitch/__init__.py"
+        ):
             with patch.object(os, "walk", return_value=[]):
                 with patch.object(os.path, "exists", return_value=False):
                     download_models._check_basic_pitch()
