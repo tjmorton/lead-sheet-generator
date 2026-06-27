@@ -1,9 +1,6 @@
 """Entry point for audio-detection queue processing"""
 
 import logging
-import os
-import sys
-import warnings
 
 # NOTE: (tjm) Temporarily removing
 # from .messaging import start_listener
@@ -11,46 +8,14 @@ import warnings
 # In general, I don't want to access env vars via os.environ
 #   I'd like some indirection between that and our application code
 #   Helpful for things like env var validation, and early fail if miscongifured
-from .utils.environment import get_environment
+from .utils import configure_logging, get_environment
 
-# Suppress noisy output from TensorFlow libraries
-# We should probably just add this to the .env.example and pass it via docker-compose
-# TODO: (tjm) set this via docker-compose
-os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "3")
+configure_logging()
 
-# Suppress deprecation wartnings from crema's use of pkg_resources / librosa API
-warnings.filterwarnings("ignore", category=FutureWarning, module="crema")
-warnings.filterwarnings("ignore", message="pkg_resources is deprecated")
+logger = logging.getLogger(__name__)
 
-# Configure application logging at the root level
-#   CRITICAL = 50
-#   FATAL = CRITICAL
-#   ERROR = 40
-#   WARNING = 30
-#   WARN = WARNING
-#   INFO = 20
-#   DEBUG = 10
-#   NOTSET = 0
-# TODO: (tjm) Let's set this by get_environment
-logging.basicConfig(
-    level=logging.DEBUG,
-    # log message format TODO: (tjm) we should have this as JSON in prod (or maybe add otel?)
-    format="%(asctime)s - %(name)s - %(levelname) - %(message)s",
-    handlers=[logging.StreamHandler(sys.stdout)],
-)
+def main():
+    logger.info("testing 123")
 
-# Dependencies by convention will call logging.getLogger(<dependencyname>)
-#   So for a bunch of dependency logs we want to want to typically silence we'll loop over
-#   a list of libraries and set their log levels
-for _lib in (
-    "tensorflow",
-    "absl",
-    "h5py",
-    "onnxruntime",
-    "basic_pitch",
-    "urllib",
-    "botocore",
-    "boto3",
-    "pika",
-):
-    logging.getLogger(_lib).setLevel(logging.ERROR)
+if __name__ == "__main__":
+    main()
