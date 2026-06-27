@@ -5,10 +5,20 @@
 ```
 tests/
     __init__.py          # docstring: """Unit tests for the audio_detection package."""
-    test_<module>.py     # mirrors src/audio_detection/<module>.py
+    test_<module>.py     # mirrors src/audio_detection/<module>.py (flat / top-level only)
+    <subpackage>/
+        __init__.py      # docstring: """Tests for audio_detection.<subpackage>"""
+        test_<module>.py # mirrors src/audio_detection/<subpackage>/<module>.py
 ```
 
 Tests live under `tests/` alongside (not inside) `src/`.  The `[tool.pytest.ini_options]` block in `pyproject.toml` sets discovery to `testpaths = ["tests"]`.
+
+Mirror the source subpackage structure under `tests/`. Each subdirectory needs its own `__init__.py` with a docstring describing what subpackage its tests cover.
+
+| Source | Test file |
+|--------|-----------|
+| `src/audio_detection/foo.py` | `tests/test_foo.py` |
+| `src/audio_detection/utils/bar.py` | `tests/utils/test_bar.py` |
 
 ## Naming
 
@@ -62,6 +72,44 @@ with (
 ):
     module_under_test._check_demucs()
 ```
+
+## Testing modules with import-time side effects
+
+Some modules run code at import time (e.g. `environment.py` calls `_load_environment()` at module level). This makes them unimportable when required env vars are missing.
+
+To test such modules in isolation, use a helper that clears env vars, removes the cached module from `sys.modules`, and re-imports it with controlled env:
+
+```python
+import importlib
+import sys
+
+import pytest
+
+MODULE = "audio_detection.utils.environment"
+_REQUIRED_ENV = {
+    "RABBITMQ_HOST": "localhost",
+    "RABBITMQ_PORT": "5672",
+    # ... all required vars with test defaults
+}
+
+@pytest.fixture(autouse=True)
+def _reset_module():
+    yield
+    sys.modules.pop(MODULE, None)
+
+def _import_module(monkeypatch, **overrides):
+    for key in _REQUIRED_ENV:
+        monkeypatch.delenv(key, raising=False)
+    for key, value in {**_REQUIRED_ENV, **overrides}.items():
+        if value is None:
+            monkeypatch.delenv(key, raising=False)
+        else:
+            monkeypatch.setenv(key, value)
+    sys.modules.pop(MODULE, None)
+    return importlib.import_module(MODULE)
+```
+
+This is the **only** scenario where `@pytest.fixture(autouse=True)` is appropriate — the `autouse` fixture ensures `sys.modules` is cleaned up after every test so one test's import doesn't pollute the next.
 
 ## Assertions
 
