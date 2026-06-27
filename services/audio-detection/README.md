@@ -1,0 +1,4 @@
+- Python service
+- Listens on a RabbitMQ topic with an s3 URL to audio, and song metadata
+- Extracts song chords, song stems, and generates midi from stem audio
+- Uploads chords json blob, song metadata, and midi and audio stems to web-app backend.

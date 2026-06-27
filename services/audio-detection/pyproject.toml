@@ -1,0 +1,98 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "song-chords-audio-detection"
+version = "0.1.0"
+description = "Analyse audio for chords and stem separate"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "python-dotenv>=1.0.0",
+    "Cython>=0.29.0",
+    "torchaudio>=2.0.0",
+    "librosa>=0.10.0",
+    # madmom from GitHub for Python 3.11+ compatibility
+    "madmom @ git+https://github.com/CPJKU/madmom.git",
+    "scipy>=1.10.0",
+    "soundfile>=0.12.0",
+    "torch>=2.0.0",
+    # -- crema dependency chain --
+    # crema is unmaintained and doesn't declare its real compatibility bounds.
+    # All three upper-bound pins below exist because of crema:
+    #   crema → keras 2.x API    → tensorflow <2.16 (2.16+ ships Keras 3.x)
+    #   tensorflow <2.16           → compiled against numpy 1.x (but doesn't declare it)
+    #   crema → pumpp → sklearn   → LabelEncoder breaks on scikit-learn 1.7+
+    #   crema uses pkg_resources at runtime but doesn't declare setuptools
+    #   setuptools 81+ deprecated pkg_resources (removed in 82+), so pin <81
+    # If crema is ever replaced, these pins can be removed.
+    "crema>=0.1.0",
+    "setuptools>=61.0,<81",
+    "tensorflow>=2.12.0,<2.16.0",
+    "numpy>=1.24.0,<2.0.0",
+    "scikit-learn>=1.3.0,<1.7.0",
+    # Message queue
+    "pika>=1.3.0",
+    # AWS S3 (LocalStack compatible)
+    "boto3>=1.28.0",
+    # HTTP client
+    "requests>=2.31.0",
+    # -- Stem separation (Demucs) --
+    "demucs>=4.0.0",
+    # -- Audio-to-MIDI transcription (basic-pitch with ONNX backend) --
+    # Pinned: _predict_in_memory calls internal functions whose signatures
+    # changed on GitHub main (e.g. unwrap_output gained a hop_size param).
+    "basic-pitch[onnx]>=0.3.0,<0.5.0",
+    # -- MIDI I/O --
+    "pretty-midi>=0.2.10",
+]
+
+[project.scripts]
+song-chords = "song_chords.__main__:main"
+test-harness = "test_harness.publisher:main"
+inspect-midi = "song_chords.debug.inspection:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-dotenv>=0.5.0",
+    "watchdog[watchmedo]",
+    "ruff>=0.8.0",
+]
+
+[tool.uv]
+
+[tool.uv.extra-build-dependencies]
+madmom = ["setuptools", "Cython", "numpy"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v"
+env_files = [".env"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 88
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "F",    # pyflakes
+    "I",    # isort
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "SIM",  # flake8-simplify
+    "RUF",  # ruff-specific rules
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
