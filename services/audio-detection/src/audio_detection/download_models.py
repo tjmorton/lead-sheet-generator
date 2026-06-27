@@ -6,7 +6,7 @@ def _check_demucs():
     from demucs.pretrained import get_model
 
     cache = os.path.expanduser("~/.cache/torch/hub/checkpoints")
-    print(f"host: pretrained_models/torch_hub/checkpoints/")
+    print("host: pretrained_models/torch_hub/checkpoints/")
     print(f"container: {cache}")
 
     existing = os.listdir(cache) if os.path.isdir(cache) else []
@@ -26,10 +26,11 @@ def _check_demucs():
 
 def _check_basic_pitch():
     from pathlib import Path
+
     import basic_pitch
 
     model_dir = str(Path(basic_pitch.__file__).parent / "saved_models" / "icassp_2022")
-    print(f"host: pretrained_models/basic_pitch/")
+    print("host: pretrained_models/basic_pitch/")
     print(f"container: {model_dir}")
 
     n_files = sum(1 for _r, _d, fs in os.walk(model_dir) for _ in fs)
@@ -38,11 +39,12 @@ def _check_basic_pitch():
 
 def _check_crema():
     from pathlib import Path
+
     import pkg_resources
 
     model_path = Path(pkg_resources.resource_filename("crema.models.chord", "model.h5"))
     model_dir = str(model_path.parent)
-    print(f"host: pretrained_models/crema/")
+    print("host: pretrained_models/crema/")
     print(f"container: {model_dir}")
 
     expected = ["model.h5", "model_spec.pkl", "pump.pkl", "version.txt"]
@@ -52,10 +54,11 @@ def _check_crema():
 
 def _check_madmom():
     from pathlib import Path
+
     import madmom.models
 
     models_dir = str(Path(madmom.models.__file__).parent)
-    print(f"host: pretrained_models/madmom/")
+    print("host: pretrained_models/madmom/")
     print(f"container: {models_dir}")
 
     pkl_count = 0
