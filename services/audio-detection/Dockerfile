@@ -48,7 +48,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 # Build-time stash of bundled model files for the dev entrypoint.
 # Volumes overlay site-packages at runtime, hiding the originals, so we
 # need a separate copy in the image that the entrypoint can copy from.
-RUN uv run python -c "
+RUN <<PYEOF uv run python -
 import shutil
 from pathlib import Path
 import basic_pitch, crema.models, madmom.models
@@ -60,7 +60,7 @@ cm = Path(crema.models.__file__).parent / 'chord'
 shutil.copytree(cm, stash / 'crema', dirs_exist_ok=True)
 mm = Path(madmom.models.__file__).parent
 shutil.copytree(mm, stash / 'madmom', dirs_exist_ok=True)
-"
+PYEOF
 
 COPY docker-entrypoint-dev-model-download.sh /docker-entrypoint-dev-model-download.sh
 
