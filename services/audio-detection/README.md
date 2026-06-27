@@ -3,6 +3,21 @@
 - Extracts song chords, song stems, and generates midi from stem audio
 - Uploads chords json blob, song metadata, and midi and audio stems to web-app backend.
 
+# Development
+
+The audio-dection service uses python, and uv.
+
+- Run `uv sync` in this service directory create a virtual env, and download dependencies.
+- When doing development in some code editors, you may need to point it at the python interpreter in your .venv
+- In VS Code, open the command pallette and select 'Python: Select Interpreter', and point to a file path: `services/audio-detection/.venv/bin/python`
+
+## Linting/formatter:
+```bash
+uv run ruff check .          # lint
+uv run ruff format --check . # check formatting
+uv run ruff format .         # auto-fix formatting
+```
+
 # Running
 
 # Clean test
@@ -20,9 +35,3 @@ docker build -t audio-detection:prod \
 docker run --rm audio-detection:prod
 ```
 
-# Linting/formatter:
-```bash
-uv run ruff check .          # lint
-uv run ruff format --check . # check formatting
-uv run ruff format .         # auto-fix formatting
-```
