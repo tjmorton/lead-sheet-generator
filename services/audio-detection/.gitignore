@@ -11,3 +11,6 @@ venv/
 
 # Local model caches
 pretrained_models/
+
+# Build artifacts
+*.egg-info/

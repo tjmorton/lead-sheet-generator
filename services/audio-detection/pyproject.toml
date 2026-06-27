@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "song-chords-audio-detection"
+name = "lead-sheet-generator"
 version = "0.1.0"
 description = "Analyse audio for chords and stem separate"
 readme = "README.md"
@@ -49,9 +49,8 @@ dependencies = [
 ]
 
 [project.scripts]
-song-chords = "song_chords.__main__:main"
-test-harness = "test_harness.publisher:main"
-inspect-midi = "song_chords.debug.inspection:main"
+song-chords = "audio_detection.__main__:main"
+download-models = "audio_detection.download_models:main"
 
 [dependency-groups]
 dev = [

@@ -1,0 +1,13 @@
+services:
+  audio-detection:
+    build:
+      context: services/audio-detection
+      dockerfile: Dockerfile
+      target: dev
+    volumes:
+      - ./services/audio-detection/pretrained_models/torch_hub:/root/.cache/torch/hub
+      - ./services/audio-detection/pretrained_models/basic_pitch:/app/.venv/lib/python3.11/site-packages/basic_pitch/saved_models/icassp_2022
+      - ./services/audio-detection/pretrained_models/crema:/app/.venv/lib/python3.11/site-packages/crema/models/chord
+      - ./services/audio-detection/pretrained_models/madmom:/app/.venv/lib/python3.11/site-packages/madmom/models
+    environment:
+      TORCH_HOME: /root/.cache/torch

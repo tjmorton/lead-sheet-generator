@@ -1,14 +1,32 @@
 FROM python:3.11-slim AS base
 
+# ---------------------------------------------------------------------------
+# Model-weight strategy:
+#
+#   basic-pitch, crema, madmom  – weights are *bundled* in the pip package.
+#                                 `uv sync` extracts them into site-packages.
+#                                 Nothing downloads at runtime.
+#
+#   demucs                      – downloads htdemucs (~80 MB) at runtime
+#                                 via torch.hub to ~/.cache/torch/hub/.
+#
+#   Dev target (docker compose):
+#     Volume-mounts site-packages subdirs + torch hub cache to
+#     ./pretrained_models/ on the host.  Models survive container
+#     rebuilds.  The entrypoint seeds empty volumes from a build-time
+#     stash on first run.
+#
+#   Production target (standalone):
+#     No volume mounts.  All weights are baked into the image.
+#     demucs is pre-downloaded with a RUN step so it never hits the
+#     network at container start.
+# ---------------------------------------------------------------------------
+
 # Install uv
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
 ENV UV_COMPILE_BYTECODE=1
 ENV UV_LINK_MODE=copy
 
-# Install system dependencies for audio processing
-# - sox and codecs for audio file loading (mp3, ogg, flac, etc.)
-# - build tools for compiling madmom from source
-# - git for installing madmom from GitHub
 RUN apt-get update && apt-get install -y \
     build-essential \
     git \
@@ -22,34 +40,46 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-# Install dependencies first (cached unless pyproject.toml/uv.lock change).
-# The --mount=type=cache persists uv's download cache across rebuilds so
-# packages are not re-downloaded even when the layer is invalidated.
 COPY pyproject.toml uv.lock README.md ./
 COPY src/ ./src/
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-dev
 
-# Pre-download the Demucs htdemucs model weights (~80 MB) so they are
-# baked into the image layer and not re-downloaded on every container start.
-# The same weights work for both CPU and CUDA inference.
-RUN uv run --no-sync python -c \
-    "from demucs.pretrained import get_model; get_model('htdemucs')"
+# Build-time stash of bundled model files for the dev entrypoint.
+# Volumes overlay site-packages at runtime, hiding the originals, so we
+# need a separate copy in the image that the entrypoint can copy from.
+RUN uv run python -c "
+import shutil
+from pathlib import Path
+import basic_pitch, crema.models, madmom.models
+stash = Path('/model_stash')
+stash.mkdir(exist_ok=True)
+bp = Path(basic_pitch.__file__).parent / 'saved_models' / 'icassp_2022'
+shutil.copytree(bp, stash / 'basic_pitch', dirs_exist_ok=True)
+cm = Path(crema.models.__file__).parent / 'chord'
+shutil.copytree(cm, stash / 'crema', dirs_exist_ok=True)
+mm = Path(madmom.models.__file__).parent
+shutil.copytree(mm, stash / 'madmom', dirs_exist_ok=True)
+"
 
-# Development target - uses volume mounts for hot reload
+COPY docker-entrypoint-dev-model-download.sh /docker-entrypoint-dev-model-download.sh
+
+# --- dev: volume-mounts pretrained_models/ for fast rebuilds ---
 FROM base AS dev
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen
-CMD ["uv", "run", "--no-sync", "song-chords"]
+ENTRYPOINT ["/docker-entrypoint-dev-model-download.sh"]
+CMD ["uv", "run", "--no-sync", "download-models"]
 
-# Production target - runs the application
+# --- production: no volumes, no entrypoint, models baked into image ---
 FROM base AS production
+RUN uv run python -c \
+    "from demucs.pretrained import get_model; get_model('htdemucs')"
 CMD ["uv", "run", "--no-sync", "song-chords"]
 
-# Test target - runs tests
+# --- test ---
 FROM base AS test
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen
 COPY tests/ ./tests/
 CMD ["uv", "run", "--no-sync", "pytest", "-v"]
-
