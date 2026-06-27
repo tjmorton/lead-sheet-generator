@@ -11,11 +11,18 @@ The audio-dection service uses python, and uv.
 - When doing development in some code editors, you may need to point it at the python interpreter in your .venv
 - In VS Code, open the command pallette and select 'Python: Select Interpreter', and point to a file path: `services/audio-detection/.venv/bin/python`
 
-## Linting/formatter:
+## Linting/formatter
 ```bash
 uv run ruff check .          # lint
 uv run ruff format --check . # check formatting
 uv run ruff format .         # auto-fix formatting
+```
+## Unit Tests
+
+- Our `pyproject.toml` tells pytest how to find and run our tests in tool.pytest.ini_options section
+
+```bash
+uv run pytest -v
 ```
 
 # Running

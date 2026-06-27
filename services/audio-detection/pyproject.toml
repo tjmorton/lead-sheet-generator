@@ -49,7 +49,7 @@ dependencies = [
 ]
 
 [project.scripts]
-song-chords = "audio_detection.__main__:main"
+audio-detection = "audio_detection.__main__:main"
 download-models = "audio_detection.download_models:main"
 
 [dependency-groups]
