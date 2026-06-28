@@ -25,6 +25,8 @@ services:
       start_period: 45s
 
   test-harness:
+    profiles:
+      - test
     build:
       context: services/test-harness
       dockerfile: Dockerfile
