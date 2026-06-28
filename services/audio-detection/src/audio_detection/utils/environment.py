@@ -4,11 +4,6 @@ Loads and validate environment variables at import time (ideally app startup),
 ensureing all required configuration is present before the application runs
 """
 
-# NOTE: (tjm) When _not_ running via docker compose we could
-#   from dotenv import load_dotenv
-#   load_dotenv(dotenv_path=".env")
-# But I'm not supporting that use case right now
-
 import os
 
 
