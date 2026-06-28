@@ -13,3 +13,54 @@ services:
       - ./services/audio-detection/.env
     environment:
       TORCH_HOME: /root/.cache/torch
+    gpus: all # We want to allow CUDA access
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "/docker-healthcheck.py"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 45s
+
+  test-harness:
+    build:
+      context: services/test-harness
+      dockerfile: Dockerfile
+      target: dev
+    env_file:
+      - ./services/test-harness/.env
+    depends_on:
+      audio-detection:
+        condition: service_healthy
+
+  # RabbitMQ message broker with management UI
+  rabbitmq:
+    image: rabbitmq:3.12-management
+    ports:
+      - "5672:5672"    # AMQP protocol
+      - "15672:15672"  # Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-admin}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-admin123}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  rabbitmq_data:
+    name: lead-sheet-generator-rabbitmq-data
+  # localstack_data:
+  #   name: lead-sheet-generator-localstack-data
+  # postgres_data:
+  #   name: lead-sheet-generator-postgres-data
+
+networks:
+  default:
+    name: lead-sheet-generator-network
+    external: false

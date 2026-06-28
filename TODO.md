@@ -1,2 +1,9 @@
 - Move the logging setup in audio-detection __main.py__ to it's own utility function
-- [done] Change download_models to a utils module
+- Why do I have to rebuild container to see src changes?
+- Add .env.example files
+  - Make it clear they're inteded for docker use case
+- audio-detection service should be considered healthy once consuming rabbitmq queue
+- audio-detections docker-entrypoint sh file could be py for consistency with the docker-healthcheck file
+- test-harness maybe should not show up in a `docker-compose up` by default
+  - I think I can use docker compose profiles here
+  - We would have to change how we then invoke the test harness with a --profile flag I think

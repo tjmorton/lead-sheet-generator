@@ -9,7 +9,6 @@ description = "Analyse audio for chords and stem separate"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "python-dotenv>=1.0.0",
     "Cython>=0.29.0",
     "torchaudio>=2.0.0",
     "librosa>=0.10.0",
