@@ -1,2 +1,2 @@
 - Move the logging setup in audio-detection __main.py__ to it's own utility function
-- [done] Change download_models to a utils module
+- Why do I have to rebuild container to see src changes?

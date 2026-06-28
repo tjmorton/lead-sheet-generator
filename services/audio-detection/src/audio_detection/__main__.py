@@ -2,14 +2,7 @@
 
 import logging
 
-from .utils import configure_logging
-
-# NOTE: (tjm) Temporarily removing
-# from .messaging import start_listener
-# from .utils.bootstrap import bootstrap_infrastructure
-# In general, I don't want to access env vars via os.environ
-#   I'd like some indirection between that and our application code
-#   Helpful for things like env var validation, and early fail if miscongifured
+from .utils import configure_logging, ensure_rabbitmq_queue, start_listener
 
 configure_logging()
 
@@ -17,6 +10,14 @@ logger = logging.getLogger(__name__)
 
 
 def main():
+    """Long running process that consumes a rabbitMQ queue
+
+    Processes audio referenced by s3 URL in queue message
+
+    POSTs results to web-app service
+    """
+    logger.info("Starting audio-detection service")
+
     # We have to lazy import this. One of the imports under ensure_ml_models
     # adds a StreamHandler <stderr> to Python's root logger during its own import.
     # After that, logging.basicConfig() fails because the root logger already has
@@ -34,8 +35,15 @@ def main():
     # https://github.com/microsoft/onnxruntime/pull/27645
     from .utils.model_cache import ensure_ml_models
 
+    logger.info("Ensuring ML models are present")
     ensure_ml_models()
-    logger.info("testing 123")
+
+    logger.info("Ensuring RabbitMQ queue exists")
+    ensure_rabbitmq_queue()
+
+    logger.info("Starting RabbitMQ queue listener")
+    start_listener()
+
 
 
 if __name__ == "__main__":
