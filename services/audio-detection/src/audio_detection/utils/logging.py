@@ -30,7 +30,7 @@ def configure_logging() -> None:
     logging.basicConfig(
         level=logging.DEBUG,
         # log message format TODO: (tjm) we should have this as JSON in prod (or maybe add otel?)
-        format="%(asctime)s - %(name)s - %(levelname) - %(message)s",
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         handlers=[logging.StreamHandler(sys.stdout)],
     )
 

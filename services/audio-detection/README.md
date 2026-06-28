@@ -27,7 +27,17 @@ uv run pytest -v
 
 # Running
 
-# Clean test
+## Running the app via uv
+```bash
+uv run --env-file .env audio-detection
+```
+
+## Running the app via docker compose (recommended)
+```bash
+docker compose run audio-detection
+```
+
+## Clean test
 ```bash
 # From monorepo root (where the docker compose lives)
 rm -rf services/audio-detection/pretrained_models/*/
