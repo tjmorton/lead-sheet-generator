@@ -21,7 +21,7 @@ def main():
     # adds a StreamHandler <stderr> to Python's root logger during its own import.
     # After that, logging.basicConfig() fails because the root logger already has
     # handlers.
-    # TODO: (tjm) Understand this more - I must be missing something 
+    # TODO: (tjm) Understand this more - I must be missing something
     from .utils.model_cache import ensure_ml_models
 
     ensure_ml_models()
