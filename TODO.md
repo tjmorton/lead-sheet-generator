@@ -1,2 +1,5 @@
 - Move the logging setup in audio-detection __main.py__ to it's own utility function
 - Why do I have to rebuild container to see src changes?
+- Add .env.example files
+  - Make it clear they're inteded for docker use case
+- audio-detection service should be considered healthy once consuming rabbitmq queue

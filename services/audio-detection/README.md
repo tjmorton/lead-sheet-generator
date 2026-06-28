@@ -28,11 +28,17 @@ uv run pytest -v
 # Running
 
 ## Running the app via uv
+
+From this directory:
+
 ```bash
 uv run --env-file .env audio-detection
 ```
 
 ## Running the app via docker compose (recommended)
+
+From the root of the monorepo:
+
 ```bash
 docker compose run audio-detection
 ```

@@ -18,6 +18,17 @@ services:
       audio-detection-rabbitmq:
         condition: service_healthy
 
+  test-harness:
+    build:
+      context: services/test-harness
+      dockerfile: Dockerfile
+      target: dev
+    env_file:
+      - ./services/test-harness/.env
+    depends_on:
+      audio-detection:
+        condition: service_started
+
   # RabbitMQ message broker with management UI
   audio-detection-rabbitmq:
     image: rabbitmq:3.12-management
