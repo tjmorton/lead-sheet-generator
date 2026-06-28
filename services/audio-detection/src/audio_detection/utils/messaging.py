@@ -31,9 +31,7 @@ def ensure_rabbitmq_queue() -> None:
 
     credentials = pika.PlainCredentials(user, password)
 
-    connection_params = pika.ConnectionParameters(
-        host=host, port=port, credentials=credentials
-    )
+    connection_params = pika.ConnectionParameters(host=host, port=port, credentials=credentials)
 
     try:
         # TODO: (tjm) Is there an asyncio equivalent of this?

@@ -31,7 +31,7 @@ uv run ruff check .            # lint
 uv run ruff format --check .   # check formatting
 uv run ruff format .           # auto-fix formatting
 uv run pytest -v               # all tests (ML models are mocked — tests run in seconds)
-uv run download-models         # check + trigger model weight downloads
+uv run audio-detection         # starts the service (runs model check on startup)
 ```
 
 Docker Compose commands from repo **root**:
@@ -47,10 +47,26 @@ docker compose run --rm audio-detection
 - **Lint/formatter**: `ruff` (not black/isort/flake8). Config in `pyproject.toml` under `[tool.ruff]`.
 - **Tests**: `pytest` with `pytest-cov` and `pytest-dotenv`. Never load real ML models in tests — mock them entirely. See `services/audio-detection/tests/AGENTS.md` for full test conventions.
 - **Package source**: `src/audio_detection/`. Entry points in `[project.scripts]` in `pyproject.toml`.
+- **Return type annotations**: Every function must have an explicit return type, even `None`. Do not leave it implicit.
+
+  ```python
+  # Correct
+  def ensure_ml_models() -> None: ...
+  def get_model_path(name: str) -> Path: ...
+  def maybe_load(name: str) -> Model | None: ...
+
+  # Wrong — missing return type
+  def ensure_ml_models(): ...
+  ```
 
 ## Node conventions (web-app)
 
 - TODO
+
+## Critical conventions
+
+- **Preserve user comments — never delete them without asking.** This includes commented-out code, TODO/NOTE/HACK/FIXME markers, and any explanatory notes. If you need to move or restructure code around a comment, keep the comment. Ask before removing. The `__main__.py` NOTE block from Tom is a standing example — never touch it.
+- **Return type annotations**: Every function must have an explicit return type, even `None`. Do not leave it implicit.
 
 ## Critical dependency pins
 

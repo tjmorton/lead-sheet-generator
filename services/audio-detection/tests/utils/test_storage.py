@@ -21,9 +21,7 @@ class TestEnsureS3Bucket:
 
     def test_creates_bucket_when_not_found(self):
         mock_client = MagicMock()
-        mock_client.head_bucket.side_effect = ClientError(
-            {"Error": {"Code": "404"}}, "HeadBucket"
-        )
+        mock_client.head_bucket.side_effect = ClientError({"Error": {"Code": "404"}}, "HeadBucket")
 
         with patch("boto3.client", return_value=mock_client):
             storage.ensure_s3_bucket()
@@ -33,9 +31,7 @@ class TestEnsureS3Bucket:
 
     def test_raises_on_unexpected_head_error(self):
         mock_client = MagicMock()
-        mock_client.head_bucket.side_effect = ClientError(
-            {"Error": {"Code": "403"}}, "HeadBucket"
-        )
+        mock_client.head_bucket.side_effect = ClientError({"Error": {"Code": "403"}}, "HeadBucket")
 
         with (
             patch("boto3.client", return_value=mock_client),
@@ -47,9 +43,7 @@ class TestEnsureS3Bucket:
 
     def test_raises_on_create_failure(self):
         mock_client = MagicMock()
-        mock_client.head_bucket.side_effect = ClientError(
-            {"Error": {"Code": "404"}}, "HeadBucket"
-        )
+        mock_client.head_bucket.side_effect = ClientError({"Error": {"Code": "404"}}, "HeadBucket")
         mock_client.create_bucket.side_effect = ClientError(
             {"Error": {"Code": "BucketAlreadyExists"}}, "CreateBucket"
         )

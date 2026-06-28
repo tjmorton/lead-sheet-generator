@@ -24,7 +24,7 @@ Mirror the source subpackage structure under `tests/`. Each subdirectory needs i
 
 | Thing | Convention | Example |
 |-------|-----------|---------|
-| Test file | `test_<module>.py` | `test_download_models.py` for `download_models.py` |
+| Test file | `test_<module>.py` | `test_model_cache.py` for `model_cache.py` |
 | Test class | `Test<Concept>` | `TestCheckDemucs`, `TestMain` |
 | Test method | `test_<snake_case_behavior>` | `test_cached_reports_no_download` |
 
@@ -158,7 +158,7 @@ uv run pytest -v
 
 A single file:
 ```bash
-uv run pytest tests/test_download_models.py -v
+uv run pytest tests/utils/test_model_cache.py -v
 ```
 
 Coverage:

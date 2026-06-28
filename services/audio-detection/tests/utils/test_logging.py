@@ -36,9 +36,7 @@ class TestConfigureLogging:
         with patch.object(warnings, "filterwarnings") as mock_filter:
             logging_utils.configure_logging()
 
-        mock_filter.assert_any_call(
-            "ignore", category=FutureWarning, module="crema"
-        )
+        mock_filter.assert_any_call("ignore", category=FutureWarning, module="crema")
 
     def test_suppresses_pkg_resources_warning(self):
         with patch.object(warnings, "filterwarnings") as mock_filter:

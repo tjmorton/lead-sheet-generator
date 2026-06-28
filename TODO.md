@@ -1,6 +1,2 @@
 - Move the logging setup in audio-detection __main.py__ to it's own utility function
-- Change download_models to a utils module
-  - Call it in main as one of the first thing
-  - Change print to logs
-  - Would this change our caching at all?
-  - test_download_models will need to move / maybe change
+- [done] Change download_models to a utils module

@@ -18,9 +18,7 @@ class TestEnsureRabbitmqQueue:
 
         expected_queue = messaging.config["rabbitmq_queue_name"]
         mock_conn.assert_called_once()
-        mock_channel.queue_declare.assert_called_once_with(
-            queue=expected_queue, durable=True
-        )
+        mock_channel.queue_declare.assert_called_once_with(queue=expected_queue, durable=True)
         mock_connection.close.assert_called_once()
 
     def test_raises_on_connection_failure(self):

@@ -33,7 +33,7 @@ def _get_env_as_boolean(var_name: str, default_value: bool) -> bool:
     value = os.getenv(var_name)
 
     # If the value is missing, return the default
-    # TODO: (tjm) I should get rid of this concept - feature flags should always be set 
+    # TODO: (tjm) I should get rid of this concept - feature flags should always be set
     # as True or False
     if not value:
         return default_value
@@ -93,18 +93,14 @@ def _load_environment() -> dict:
         # sustained chords at bar boundaries in the chord MIDI.  Defaults
         # to "true" so piano / pad voicings don't decay to silence over
         # long held chords.
-        "midi_replay_chords_at_bar": _get_env_as_boolean(
-            "MIDI_REPLAY_CHORDS_AT_BAR", True
-        ),
+        "midi_replay_chords_at_bar": _get_env_as_boolean("MIDI_REPLAY_CHORDS_AT_BAR", True),
         # Set MIDI_QUANTIZE=false to disable snapping vocal and bass MIDI
         # note onsets and offsets to the nearest 16th-note grid position.
         # Defaults to "true" for a tighter, more notation-friendly result.
         "midi_quantize": _get_env_as_boolean("MIDI_QUANTIZE", True),
         # Set VOCAL_MIDI_BACKEND to choose the live vocal MIDI source.
         # Supported values: basic_pitch, omnizart.
-        "vocal_midi_backend": _get_env_with_default(
-            "VOCAL_MIDI_BACKEND", "basic_pitch"
-        ),
+        "vocal_midi_backend": _get_env_with_default("VOCAL_MIDI_BACKEND", "basic_pitch"),
         # Set VOCAL_MIDI_PROFILE to choose the vocal cleanup preset.
         # Supported values: default, balanced, high_quality.
         "vocal_midi_profile": _get_env_with_default("VOCAL_MIDI_PROFILE", "default"),
@@ -122,9 +118,7 @@ def _load_environment() -> dict:
             True,
         ),
         # When set, ... TODO: (tjm) Remind myself what this does
-        "cleanup_bass_boundary": _get_env_as_boolean(
-            "MIDI_CLEANUP_BASS_BOUNDARY", True
-        ),
+        "cleanup_bass_boundary": _get_env_as_boolean("MIDI_CLEANUP_BASS_BOUNDARY", True),
         # When set, ... TODO: (tjm) Remind myself what this does
         "cleanup_bass_sustain_normalization": _get_env_as_boolean(
             "MIDI_CLEANUP_BASS_SUSTAIN_NORMALIZATION",
