@@ -4,6 +4,38 @@ import logging
 import os
 import sys
 import warnings
+from contextlib import contextmanager
+
+
+# NOTE: (tjm) contextmanager allows us to use this with 'with'
+#   keyword 
+#   We're using a generator function rather than a class with enter and exit dunders
+#   It's more concise and suits me better
+#   Everything before the yeild is onenter, the yield is there with body code exec starts
+#   and everything after the yield is onexit.
+@contextmanager
+def suppress_stderr():
+    """Redirect stderr to /dev/null at the file-descriptor level.
+
+    Works on C++ stderr writes (e.g. onnxruntime's device_discovery warning)
+    that bypass Python's sys.stderr.
+
+    onnxruntime has a known bug where pybind hardcodes WARNING level at import
+    time, ignoring ORT_LOGGING_LEVEL / ORT_LOG_SEVERITY_LEVEL.
+    https://github.com/microsoft/onnxruntime/pull/27645
+    """
+    # equivalent to class based __enter__
+    stderr_fd = sys.stderr.fileno()
+    saved = os.dup(stderr_fd)
+    devnull = os.open(os.devnull, os.O_WRONLY)
+    os.dup2(devnull, stderr_fd)
+    os.close(devnull)
+    try:
+        yield # this is where the with body executes
+    finally: # equivalent to class based __exit__
+        os.dup2(saved, stderr_fd)
+        os.close(saved)
+
 
 # Root-level warning messages from dependencies that we can't silence
 # by setting the library's own logger level (they call logging.warning()
@@ -28,13 +60,15 @@ class _SuppressRootPatterns(logging.Filter):
 
 def configure_logging() -> None:
     """Configure the root level app logging"""
-    # Suppress noisy output from TensorFlow libraries
-    # We should probably just add this to the .env.example and pass it via docker-compose
-    # TODO: (tjm) set this via docker-compose
+    # Suppress noisy output from TensorFlow libraries.
+    # TF reads TF_CPP_MIN_LOG_LEVEL lazily (on first session creation),
+    # not at dlopen() time, so os.environ.setdefault works.
     os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "3")
-    # Suppress onnxruntime C++ logs (device discovery warnings etc.)
-    # This is separate from the Python-level onnxruntime logger.
-    os.environ.setdefault("ORT_LOG_LEVEL", "FATAL")
+
+    # NOTE: onnxruntime emits a device_discovery warning at import time from a
+    #   static C++ initializer.  pybind hardcodes the severity level, so no env
+    #   var suppresses it.  Use suppress_stderr() from this module to silence it
+    #   during the import.
 
     # Suppress deprecation wartnings from crema's use of pkg_resources / librosa API
     warnings.filterwarnings("ignore", category=FutureWarning, module="crema")
