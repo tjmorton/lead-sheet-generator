@@ -63,6 +63,7 @@ shutil.copytree(mm, stash / 'madmom', dirs_exist_ok=True)
 PYEOF
 
 COPY docker-entrypoint-dev-model-download.sh /docker-entrypoint-dev-model-download.sh
+COPY docker-healthcheck.py /docker-healthcheck.py
 
 # --- dev: volume-mounts pretrained_models/ for fast rebuilds ---
 FROM base AS dev
