@@ -12,3 +12,4 @@
 - Under my Dockerfile audio-detection dev and prod targets
   - Why doesn't prod uv sync, it doesn't build from dev and base doesn't do it
   - I don't run the docker entrypoint but that's expected - that's only to seed models so we're not constantly download them, although I'm doubting that now. As long as we ensure models on first run, we should be fine until the next docker build? Test that.
+- Figure out how to match VS Code Pylance settings, with pyproject.toml specifications and ruff
