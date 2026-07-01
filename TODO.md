@@ -7,3 +7,8 @@
 - test-harness maybe should not show up in a `docker-compose up` by default
   - I think I can use docker compose profiles here
   - We would have to change how we then invoke the test harness with a --profile flag I think
+- Ensure rabbitmq and ensure s3 I think does stuff that happens on first use anyway
+- I have to rebuild my audio detection container when the src code changes.
+- Under my Dockerfile audio-detection dev and prod targets
+  - Why doesn't prod uv sync, it doesn't build from dev and base doesn't do it
+  - I don't run the docker entrypoint but that's expected - that's only to seed models so we're not constantly download them, although I'm doubting that now. As long as we ensure models on first run, we should be fine until the next docker build? Test that.

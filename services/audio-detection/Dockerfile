@@ -70,7 +70,8 @@ FROM base AS dev
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen
 ENTRYPOINT ["/docker-entrypoint-dev-model-download.sh"]
-CMD ["uv", "run", "--no-sync", "audio-detection"]
+# CMD ["uv", "run", "--no-sync", "audio-detection"]
+CMD ["uv", "run", "--no-sync", "watchmedo", "auto-restart", "--patterns=*.py", "--recursive", "--", "uv", "run", "--no-sync", "audio-detection"]
 
 # --- production: no volumes, no entrypoint, models baked into image ---
 FROM base AS production

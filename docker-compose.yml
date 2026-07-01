@@ -5,6 +5,7 @@ services:
       dockerfile: Dockerfile
       target: dev
     volumes:
+      - ./services/audio-detection/src/:/app/src/
       - ./services/audio-detection/pretrained_models/torch_hub:/root/.cache/torch/hub
       - ./services/audio-detection/pretrained_models/basic_pitch:/app/.venv/lib/python3.11/site-packages/basic_pitch/saved_models/icassp_2022
       - ./services/audio-detection/pretrained_models/crema:/app/.venv/lib/python3.11/site-packages/crema/models/chord
@@ -31,6 +32,8 @@ services:
       context: services/test-harness
       dockerfile: Dockerfile
       target: dev
+    volumes:
+      - ./services/test-harness/src/:/app/src/
     env_file:
       - ./services/test-harness/.env
     depends_on:
@@ -54,11 +57,30 @@ services:
       timeout: 5s
       retries: 5
 
+  # LocalStack for AWS service emulation - used for s3
+  # aftifacts - audio in and out (stems) for audio-detection service
+  # as well as midi out from audio-detection service
+  localstack:
+    image: localstack/localstack:4.14.0
+    ports:
+      - "4566:4566"  # LocalStack Gateway
+    environment:
+      - SERVICES=s3
+      - PERSISTENCE=1
+      - DEBUG=1
+    volumes:
+      - localstack_data:/var/lib/localstack
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 volumes:
   rabbitmq_data:
     name: lead-sheet-generator-rabbitmq-data
-  # localstack_data:
-  #   name: lead-sheet-generator-localstack-data
+  localstack_data:
+    name: lead-sheet-generator-localstack-data
   # postgres_data:
   #   name: lead-sheet-generator-postgres-data
 

@@ -47,7 +47,7 @@ def ensure_s3_bucket() -> None:
         if error_code == "404":
             logger.debug("S3 bucket doesn't exist, creating bucket...")
             try:
-                s3_client.create_bucket(bucket_name)
+                s3_client.create_bucket(Bucket=bucket_name)
                 logger.debug("S3 bucket created")
             except ClientError as create_error:
                 logger.error("Failed to create S3 bucket, %s", create_error)

@@ -2,7 +2,12 @@
 
 import logging
 
-from .utils import configure_logging, ensure_rabbitmq_queue, start_listener
+from .utils import (
+    configure_logging,
+    ensure_rabbitmq_queue,
+    ensure_s3_bucket,
+    start_listener,
+)
 
 configure_logging()
 
@@ -41,9 +46,11 @@ def main():
     logger.info("Ensuring RabbitMQ queue exists")
     ensure_rabbitmq_queue()
 
+    logger.info("Ensuring S3 bucket exists")
+    ensure_s3_bucket()
+
     logger.info("Starting RabbitMQ queue listener")
     start_listener()
-
 
 
 if __name__ == "__main__":
