@@ -13,7 +13,7 @@ services:
       - ./services/audio-detection/.env
     environment:
       TORCH_HOME: /root/.cache/torch
-    gpus: all # We want to allow CUDA access
+    # gpus: all # We want to allow CUDA access
     depends_on:
       rabbitmq:
         condition: service_healthy
